@@ -6,7 +6,7 @@ This repository contains open-sourced AI skills and standard operating procedure
 
 | Skill | Description | Status |
 |---|---|---|
-| [Feishu Intelligent Recruitment](./feishu-intelligent-recruitment/SKILL.md) | V3 Feishu-based resume screening funnel with Red/Blue Team (Good Cop / Bad Cop) agent topology, native PDF extraction, and multi-JD dynamic matching. | 🚀 Production Ready |
+| [Lark/Feishu Intelligent Recruitment](./feishu-intelligent-recruitment/README_EN.md) | V3 Lark-based resume screening funnel with Red/Blue Team (Good Cop / Bad Cop) agent topology, native PDF extraction, and multi-JD dynamic matching. | 🚀 Production Ready |
 
 ## Usage
-These skills are designed to be used with the [OpenClaw](https://github.com/openclaw/openclaw) framework. You can copy the `SKILL.md` directly into your agent's workspace to imbue them with these enterprise-grade workflows.
+These skills are designed to be used with the [OpenClaw](https://github.com/openclaw/openclaw) framework. You can copy the `SKILL.md` (or `SKILL_EN.md`) directly into your agent's workspace to imbue them with these enterprise-grade workflows.

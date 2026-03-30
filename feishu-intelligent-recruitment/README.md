@@ -1,6 +1,8 @@
 # 🎯 飞书协同版智能招聘漏斗 (Feishu Intelligent Recruitment Funnel)
 
 这是一个用于 OpenClaw 多智能体生态的企业级开源技能 (Open Skill)。
+[🇨🇳 中文版文档](./README.md) | [🇺🇸 English Documentation](./README_EN.md)
+
 
 ## 🌟 核心特性
 - **红蓝对抗架构 (Good Cop / Bad Cop)**: 师爷猫负责极度挑剔的“X光打假”，大主管负责务实的兜底与降维匹配。
