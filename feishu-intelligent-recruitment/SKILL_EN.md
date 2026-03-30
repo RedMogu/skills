@@ -100,7 +100,7 @@ sequenceDiagram
 ---
 
 ## 🛠️ 5. Execution Standards & Guardrails
-1. **Source Acquisition**: Download PDF, use native multi-modal LLM parsing (Zero OCR).
+1. **Source Acquisition**: Download the resume. **Recommended Path:** Use the native multi-modal `pdf` tool (Zero OCR, accurately interprets layout and implicit logic). **Fallback Path:** If your Agent environment lacks native PDF capabilities, fall back to a traditional third-party OCR API to extract the document as Markdown text before feeding it to the LLM.
 2. **Asynchronous Tearing (Sub-Agent)**: Spawn the Bad Cop to generate the aggressive anti-fraud report.
 3. **Main Process Consolidation (Main Agent)**: The Good Cop executes secondary fallback evaluation to provide the final `matched_role` and `Tier`.
 4. **Safe Write-back**: Use `batch_update` with exponential backoff retries to respect Lark API rate limits.
