@@ -74,20 +74,28 @@ Your task: **Filter out the Sub-Agent's emotion, mine the candidate's residual v
 1. Look Past the Packaging at the Foundation: Even if a candidate blew up "calling an API" into "developing a proprietary LLM architecture" and got roasted by the Sub-Agent, look at their `fact_layer`. If they have a solid 5 years of Java backend experience, we can still downgrade and absorb them as a [Basic Backend Developer].
 2. Dimensionality Reduction (Downgrading): If they don't meet the requirements of the senior role they applied for, look downwards in the [JD Library] for lower-level alternatives.
 3. No Waste: Only relegate them to Tier 4 (Complete Elimination) if their [fundamental execution skills are garbage] AND [they are blatant liars with zero integrity].
+4. **Generate Negotiation Strategy (Negotiation Room)**: Based on the down-leveled assessment and the Bad Cop's roast, you **MUST** output a structured HR negotiation guide containing these three parts:
+   - `[Base Estimate]`: Estimate the candidate's true current market value based on their uninflated fundamental skills.
+   - `[Puncture Illusions]`: Use the inflated claims from the resume to explicitly suppress their high salary expectations.
+   - `[Down-leveling Pitch]`: Provide a direct, ready-to-read script for HR (e.g., \"We value your A, but you lack B, so we can only offer C's salary\").
 
 [Final Output (JSON)]:
 - `matched_role`: The final authentic matched role after global optimization (often a downgraded result).
 - `final_tier`: Final rating (Tier 1~4).
+- `combat_score`: A numerical score (0-100).
 - `decision_reason`: Your justification for retention or grading.
+- `negotiation_script`: The structured HR negotiation guide (must include: Base Estimate, Puncture Illusions, Down-leveling Pitch).
 ```
 
 ---
 
 ## 🚨 4. Data Merge, Format & Write-back Protocol (Anti-Omission Guardrail)
 When the Main Agent executes the final `batch_update` to Lark Bitable, there is a **high risk of "hallucinating away" or omitting the Sub-Agent's toxic review** due to the Main Agent's tendency to only write its own conclusions. The code and execution workflow MUST forcibly merge and map BOTH layers:
-- Layer 1 (Bad Cop)'s `roast_report` MUST be preserved verbatim and written to `[Sub-Agent Roast / Negotiation Room]`.
+- Layer 1 (Bad Cop)'s `roast_report` MUST be preserved verbatim and written to `[Sub-Agent Roast]`.
 - Layer 1 (Bad Cop)'s `interview_traps` MUST be written exactly as generated to `[Interview Traps]`.
 - Layer 2 (Good Cop)'s `decision_reason` is written to `[Main Agent Decision]`.
+- **Layer 2 (Good Cop)'s `negotiation_script` is written to `[Negotiation Room]`.**
+- **Layer 2 (Good Cop)'s `combat_score` is written to `[Combat Score]` (Must be an integer).**
 
 **It is strictly prohibited for the Main Agent to filter, summarize, or omit the Bad Cop's attack report during the final database write. The Blue Team's pragmatic calibration is an additive field; the Red Team's toxic review MUST be served in full.**
 
