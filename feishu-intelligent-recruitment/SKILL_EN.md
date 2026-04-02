@@ -141,12 +141,10 @@ sequenceDiagram
 ---
 
 ## 🛠️ 6. Execution Standards & Guardrails
-1. **Source Acquisition & File Fallback Rule (KISS Principle)**: 
-   - When receiving a resume processing task or Bitable record link, the Main Agent **is prohibited from performing complex Record ID searches or blind guessing**. It MUST strictly follow a simple Feishu-specific file fallback mechanism:
-     1. Check the Bitable field **[Parsed Resume Link (MD)]**. If it exists, use it immediately to run the process.
-     2. If there is no MD, check the field **[Original Resume Link (PDF)]**. If it exists, use it to run the process.
-     3. If neither exists, STOP and ask the user.
-   - Do NOT overcomplicate. Do NOT download both to compare which one has "better content". Keep it as simple as possible.
+1. **Source Acquisition & File Fallback Rule**: 
+   - When receiving a resume processing task or Bitable record link, the Main Agent **MUST read and examine the contents of BOTH the "Parsed Resume Link (MD)" and the "Original Resume Link (PDF)" to see which one can be used as a valid resume**.
+   - As soon as you find one containing actual resume content (prioritize checking the MD first, then the PDF), use it immediately to run the process.
+   - If neither file has valid content or neither exists, STOP and ask the user.
 2. **Observe Dynamic Routing**: Extracted PDF and MD files MUST be stored in the respective Folder Tokens specified in the **[System Routing Config]**. Retaining the anti-overwrite UUID is mandatory.
 3. **Asynchronous Tearing (Sub-Agent)**: Spawn the Bad Cop to generate the aggressive anti-fraud report.
 4. **Main Process Consolidation (Main Agent)**: **MUST strictly execute the [Data Merge Guardrail] in Section 4.**
