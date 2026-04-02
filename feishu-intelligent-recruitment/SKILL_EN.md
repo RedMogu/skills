@@ -83,13 +83,18 @@ Your task: **Filter out the Sub-Agent's emotion, mine the candidate's residual v
 
 ---
 
-## 🚨 4. Data Merge & Write-back Protocol (Anti-Omission Guardrail)
+## 🚨 4. Data Merge, Format & Write-back Protocol (Anti-Omission Guardrail)
 When the Main Agent executes the final `batch_update` to Lark Bitable, there is a **high risk of "hallucinating away" or omitting the Sub-Agent's toxic review** due to the Main Agent's tendency to only write its own conclusions. The code and execution workflow MUST forcibly merge and map BOTH layers:
 - Layer 1 (Bad Cop)'s `roast_report` MUST be preserved verbatim and written to `[Sub-Agent Roast / Negotiation Room]`.
 - Layer 1 (Bad Cop)'s `interview_traps` MUST be written exactly as generated to `[Interview Traps]`.
 - Layer 2 (Good Cop)'s `decision_reason` is written to `[Main Agent Decision]`.
 
 **It is strictly prohibited for the Main Agent to filter, summarize, or omit the Bad Cop's attack report during the final database write. The Blue Team's pragmatic calibration is an additive field; the Red Team's toxic review MUST be served in full.**
+
+[CRITICAL URL FORMAT & ROUTING CONSTRAINTS FOR BITABLE]:
+1. **URL Fields MUST be JSON Objects**: When writing URL fields like `战力雷达链接` (Radar Link) and `简历链接` (Resume Link) to Lark Bitable, you **MUST strictly use** the JSON format `{"link": "url", "text": "text"}`. The Lark API will silently drop the data if the format is incorrect!
+2. **Absolute Ban on External Links**: Links written to Bitable **MUST be 100% internal Lark Drive links** (e.g., `https://sjpygirjnpj2.jp.larksuite.com/file/<file_token>`). It is **strictly prohibited** to use any external rendering routes (such as `dashboard.redmogu.org` or other Nginx/Web URLs). Enterprise intranet data must remain completely closed-loop within the Lark ecosystem.
+3. **Independent Archiving of Evaluation Reports**: The generated Red/Blue Team Evaluation Reports (`_Evaluation.md`) MUST be moved into the dedicated Folder Token specified by `红蓝对抗评估报告路由` in the System Routing Config. **Never** leave them in the root directory of the cloud space.
 
 ---
 
@@ -126,3 +131,4 @@ sequenceDiagram
 3. **Asynchronous Tearing (Sub-Agent)**: Spawn the Bad Cop to generate the aggressive anti-fraud report.
 4. **Main Process Consolidation (Main Agent)**: **MUST strictly execute the [Data Merge Guardrail] in Section 4.**
 5. **Safe Write-back**: Use `batch_update` with exponential backoff retries.
+6. **Strict Sequential Execution**: When processing multiple resumes, it is **strictly prohibited** to spawn multiple Sub-Agents concurrently. You MUST follow a one-by-one principle: start 1 Sub-Agent for 1 resume, wait for its callback (success or complete failure) and data write-back to finish, before spawning the next.

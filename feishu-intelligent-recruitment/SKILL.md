@@ -84,13 +84,18 @@
 
 ---
 
-## 🚨 4. 数据合并与落盘防漏红线 (Data Merge & Write-back Guardrail)
+## 🚨 4. 数据合并、格式与落盘防漏红线 (Data Merge, Format & Write-back Guardrail)
 大主管在最终汇总并调用 `batch_update` 写回飞书多维表格时，**极易产生“只写自己的主观结论，漏掉师爷猫毒评”的幻觉失误**。代码及执行流程中必须强制执行完整的字段映射合并：
 - Layer 1 (师爷猫) 的 `roast_report` **必须原汁原味保留**，并写入飞书字段 `[师爷预警 (排雷)]` 与 `[压价底线策略]`。
 - Layer 1 (师爷猫) 的 `interview_traps` **必须原封不动**，写入飞书字段 `[致命面试陷阱 (Interview Traps)]`。
 - Layer 2 (大主管) 的 `decision_reason` 写入 `[大主管录用底线]`。
 
 **绝对禁止大主管在合并数据时，擅自精简、篡改或遗漏师爷猫的攻击报告！蓝方务实裁决仅作为增量字段，红方毒评必须全量上桌。**
+
+【Bitable 写入致命红线 (CRITICAL URL FORMAT & ROUTING)】：
+1. **URL 字段必须为 JSON 对象**：在向飞书多维表格（Bitable）写入 `战力雷达链接` 和 `简历链接` 等 URL 类型字段时，**必须严格遵守** `{"link": "url", "text": "文本"}` 的 JSON 格式。如果格式错误，飞书 API 将直接丢弃该字段数据！
+2. **绝对禁止外部链接**：写入 Bitable 的链接**必须 100% 是飞书内部云盘链接**（例如 `https://sjpygirjnpj2.jp.larksuite.com/file/<file_token>`）。**绝对禁止**使用任何外部渲染路由（如 `dashboard.redmogu.org` 等 Nginx/Web 链接）。企业内网数据必须在飞书生态内彻底闭环。
+3. **评估报告独立归档**：生成的红蓝对抗评估报告（`_Evaluation.md`）必须移动到 ⚙️ 系统路由配置库 中 `红蓝对抗评估报告路由` 所指定的专属 Folder Token 内，**严禁**遗留在云空间根目录。
 
 ---
 
@@ -127,3 +132,4 @@ sequenceDiagram
 3. **异步撕扯 (Sub-Agent)**：调起师爷猫生成防伪报告与**面试陷阱**。
 4. **主进程收口与防漏保护 (Main Agent)**：大主管执行二次兜底。**必须严格执行上述第4节的[数据合并红线]**。
 5. **安全写回**：使用 `batch_update` 并执行指数退避重试。
+6. **强制串行执行 (Strict Sequential Execution)**：在处理多份简历时，**绝对禁止**并发（Concurrent）开启多个 Sub-Agent。必须严格遵循“一个个做”的原则：启动 1 个 Sub-Agent 处理 1 份简历，必须等待其回调成功（或彻底失败）并完成数据写入后，才允许启动下一个。
