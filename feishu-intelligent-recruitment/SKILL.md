@@ -1,4 +1,4 @@
-# 🎯 飞书协同版智能招聘：Harness Engineering 简历筛选全自动漏斗 SOP (V3.2 - Open Skill 开放协议)
+# 🎯 飞书协同版智能招聘：Harness Engineering 简历筛选全自动漏斗 SOP (V3.3 - Open Skill 开放协议)
 
 > **核心理念**：本技能通过 **OpenClaw 多智能体协作 (A2A)**，首创了**【红蓝对抗审核机制 (Bad Cop / Good Cop)】**。师爷猫作为“红方攻击手”进行极其刻薄的扒皮打假与审讯陷阱布置；大主管作为“蓝方务实派”进行最终的残值挖掘与兜底裁决。底层依托原生 PDF 多模态解析与飞书多维表格 (Bitable) 状态机。
 
@@ -10,13 +10,13 @@
 
 ---
 
-## 🗄️ 2. 飞书多维表格 Schema 规范 (多 JD 支持)
+## 🗄️ 2. 飞书多维表格 Schema 规范 (多 JD 支持与动态路由)
 
-> **双模式支持**：若未提供现成表格 token，大主管将自动调用 API 一键创建以下三张表。
+> **双模式支持**：若未提供现成表格 token，大主管将自动调用 API 一键创建以下四张表。
 
 ### 📌 Table 1: 候选人流水表 (Candidates)
 - **Name/Email/Phone** (文本): 唯一主键。
-- **Resume File** (附件/链接): HR 上传的 PDF。
+- **Resume File** (附件/链接): HR 上传的 PDF 或飞书云盘文档直链。
 - **Applied Role / 投递岗位** (文本): 候选人明确投递的岗位。
 - **Status** (单选标签): `[Pending AI]`, `[Processing]`, `[AI Scored]`, `[Pending Human]`, `[Interviewing]`, `[Rejected]`。
 - **Matched JD / 最终适配岗位** (文本): 大主管二次裁决后判定的真实岗位。
@@ -35,6 +35,14 @@
 ### 📌 Table 3: 岗位标尺库 (JD Library)
 - **JD ID / 岗位名称** (文本主键): 例如 `资深 AI 架构师`、`海外增长运营`。
 - **核心硬性门槛** (多行文本): 必须具备的真实能力底线。
+
+### 📌 Table 4: ⚙️ 系统路由配置库 (System Routing Config)
+用于解耦底层逻辑，实现动态文件路由：
+- **配置项 (Config Key)**: 例如 `PDF 简历入库路由` 或 `Markdown 简历入库路由`。
+- **Folder Token**: 对应的飞书云盘目标文件夹 Token。
+- **机制与用途说明**: 
+  - PDF 必须指向**防重名专属目录**，严格保留 UUID 防止文件覆盖丢失。
+  - Markdown 解析件需送入默认 `candidates` 目录供大模型检阅。
 
 ---
 
@@ -66,7 +74,7 @@
 【兜底捞人逻辑】：
 1. 剥离包装看底子：哪怕候选人把“发了个公众号文章”吹成了“搭建私域生态矩阵”，或者因为时间压缩触发了 `[FLAG_TIME_BS]` 被师爷骂成狗。只要他的 `fact_layer` 具备真实的文字功底或 3 年 Java 经验，依然可以降维收编。
 2. 降维吸纳：去【JD 标尺库】里向下兼容，寻找低薪、低级的替代岗位。
-3. 绝不浪费：只有当【基础干活能力极差】且【谎话连篇（如 FLAG_GHOST_PROJECT）毫无诚信】时，才真正打入 Tier 4 彻底淘汰。
+3. 绝不浪费：只有当【基础干活能力极差】且【谎话连篇（如 FLAG_GHOST_PROJECT）毫无诚信】时，才真正打入 Tier 4彻底淘汰。
 
 【输出最终定论 (JSON)】：
 - `matched_role`: 全库寻优后的最终真实适配岗位（降维后的结果）。
@@ -85,25 +93,27 @@ sequenceDiagram
     participant Main as 大主管 (Main Agent)
     participant SubAgent as 师爷猫 (SubAgent - The Bad Cop)
 
-    HR->>Feishu: 1. 录入岗位与规则
+    HR->>Feishu: 1. 录入岗位、防伪标尺与路由配置
     HR->>Feishu: 2. 扔入简历
     
-    Main->>Main: 3. 拉取待处理简历 + 原生 pdf 解析
-    Main->>SubAgent: 4. 发起红方毒评 (The Bad Cop)
+    Main->>Feishu: 3. 读取「系统路由配置库」获取最新 Folder Token
+    Main->>Main: 4. 拉取待处理简历 + 原生 pdf 解析，双格式推入对应路由
+    Main->>SubAgent: 5. 发起红方毒评 (The Bad Cop)
     
     Note over SubAgent: 🔍 启动五大反诈红线<br/>生成 Roast Report 与 Interview Traps (审讯陷阱)
-    SubAgent-->>Main: 5. 返回毒评与陷阱
+    SubAgent-->>Main: 6. 返回毒评与陷阱
     
     Note over Main: ⚖️ 蓝方务实裁决 (The Good Cop)<br/>挖掘残值，滤除情绪，全库降维匹配
-    Main->>Main: 6. 综合判定
+    Main->>Main: 7. 综合判定
     
-    Main->>Feishu: 7. batch_update 回写多维表格
+    Main->>Feishu: 8. batch_update 回写多维表格
 ```
 
 ---
 
 ## 🛠️ 5. 标准执行步骤与防抖规范
-1. **获取源信息 (Source Acquisition)**：下载简历文件。**推荐路径：** 调用内置多模态 `pdf` 工具（Zero OCR，精准透视排版与逻辑）。**Fallback 路径：** 若您的 Agent 环境未挂载原生 PDF 能力，可回退使用传统的第三方 OCR API 将其提取为 Markdown 文本供大模型阅读。
-2. **异步撕扯 (Sub-Agent)**：调起师爷猫生成充满火药味的防伪报告与**面试陷阱**。
-3. **主进程收口 (Main Agent)**：大主管执行二次兜底，结合公司实际用人需求，给出最终定岗。
-4. **安全写回**：使用 `batch_update` 并执行指数退避重试。
+1. **获取源信息 (Source Acquisition)**：下载简历文件。**推荐路径：** 调用内置多模态 `pdf` 工具（Zero OCR，精准透视排版与逻辑）。
+2. **遵守动态路由 (Dynamic Routing)**：提取的 PDF 与 MD 文件必须按照**【系统路由配置库】**中指定的 Folder Token 分别存放，严禁写死目录或散落根盘，严禁去除防重名 UUID。
+3. **异步撕扯 (Sub-Agent)**：调起师爷猫生成充满火药味的防伪报告与**面试陷阱**。
+4. **主进程收口 (Main Agent)**：大主管执行二次兜底，结合公司实际用人需求，给出最终定岗。
+5. **安全写回**：使用 `batch_update` 并执行指数退避重试。
