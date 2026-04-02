@@ -84,7 +84,17 @@
 
 ---
 
-## 🗺️ 4. 工作流全景图 (The Pipeline)
+## 🚨 4. 数据合并与落盘防漏红线 (Data Merge & Write-back Guardrail)
+大主管在最终汇总并调用 `batch_update` 写回飞书多维表格时，**极易产生“只写自己的主观结论，漏掉师爷猫毒评”的幻觉失误**。代码及执行流程中必须强制执行完整的字段映射合并：
+- Layer 1 (师爷猫) 的 `roast_report` **必须原汁原味保留**，并写入飞书字段 `[师爷预警 (排雷)]` 与 `[压价底线策略]`。
+- Layer 1 (师爷猫) 的 `interview_traps` **必须原封不动**，写入飞书字段 `[致命面试陷阱 (Interview Traps)]`。
+- Layer 2 (大主管) 的 `decision_reason` 写入 `[大主管录用底线]`。
+
+**绝对禁止大主管在合并数据时，擅自精简、篡改或遗漏师爷猫的攻击报告！蓝方务实裁决仅作为增量字段，红方毒评必须全量上桌。**
+
+---
+
+## 🗺️ 5. 工作流全景图 (The Pipeline)
 
 ```mermaid
 sequenceDiagram
@@ -103,17 +113,17 @@ sequenceDiagram
     Note over SubAgent: 🔍 启动五大反诈红线<br/>生成 Roast Report 与 Interview Traps (审讯陷阱)
     SubAgent-->>Main: 6. 返回毒评与陷阱
     
-    Note over Main: ⚖️ 蓝方务实裁决 (The Good Cop)<br/>挖掘残值，滤除情绪，全库降维匹配
-    Main->>Main: 7. 综合判定
+    Note over Main: ⚖️ 蓝方务实裁决 (The Good Cop)<br/>强制合并师爷猫结果，全库降维匹配
+    Main->>Main: 7. 综合判定与数据拼接
     
     Main->>Feishu: 8. batch_update 回写多维表格
 ```
 
 ---
 
-## 🛠️ 5. 标准执行步骤与防抖规范
-1. **获取源信息 (Source Acquisition)**：下载简历文件。**推荐路径：** 调用内置多模态 `pdf` 工具（Zero OCR，精准透视排版与逻辑）。
-2. **遵守动态路由 (Dynamic Routing)**：提取的 PDF 与 MD 文件必须按照**【系统路由配置库】**中指定的 Folder Token 分别存放，严禁写死目录或散落根盘，严禁去除防重名 UUID。
-3. **异步撕扯 (Sub-Agent)**：调起师爷猫生成充满火药味的防伪报告与**面试陷阱**。
-4. **主进程收口 (Main Agent)**：大主管执行二次兜底，结合公司实际用人需求，给出最终定岗。
+## 🛠️ 6. 标准执行步骤与防抖规范
+1. **获取源信息 (Source Acquisition)**：调用内置多模态 `pdf` 工具（Zero OCR）。
+2. **遵守动态路由 (Dynamic Routing)**：提取的 PDF 与 MD 文件必须按照**【系统路由配置库】**中指定的 Folder Token 分别存放，严禁写死目录，严禁去除防重名 UUID。
+3. **异步撕扯 (Sub-Agent)**：调起师爷猫生成防伪报告与**面试陷阱**。
+4. **主进程收口与防漏保护 (Main Agent)**：大主管执行二次兜底。**必须严格执行上述第4节的[数据合并红线]**。
 5. **安全写回**：使用 `batch_update` 并执行指数退避重试。

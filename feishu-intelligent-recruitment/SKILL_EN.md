@@ -22,6 +22,7 @@ Strictly follows the **OpenClaw A2A Collaboration Protocol**:
 - **Matched JD** (Text): The final authentic role determined after the Main Agent's calibration.
 - **Fact Layer** (Multi-line Text): Objective facts extracted by AI.
 - **Sub-Agent Roast** (Multi-line Text): Flaws and negotiation evidence found by the Bad Cop.
+- **Interview Traps** (Multi-line Text): Deadly interview questions prepared by the Bad Cop.
 - **Main Agent Decision** (Multi-line Text): The Good Cop's final justification for retaining/grading the candidate.
 - **Tier** (Single Select): Tier 1 (Core) / Tier 2 (Cost-effective Downgrade) / Tier 3 (Cheap Labor) / Tier 4 (Eliminated).
 - **Confidence Score** (Number): 0-100. Triggers human intervention if below 60.
@@ -59,7 +60,8 @@ Your goal: Find fraud, exaggeration, and logical loopholes between the lines.
 
 [Output Requirements (JSON)]:
 - `fact_layer`: Pure objective facts stripped of all marketing fluff (data, tools, concrete outputs only).
-- `roast_report`: Your toxic attack report, including `evidence_quote` (direct quotes from the resume as hard evidence) and a biting, sarcastic question (e.g., "Candidate claims to have led a multi-million Web3 ecosystem, but lists zero conversion metrics. Ask him if handing out flyers counts as an ecosystem.").
+- `roast_report`: Your toxic attack report, including `evidence_quote` (direct quotes from the resume as hard evidence) and a biting, sarcastic question.
+- `interview_traps`: Deadly interview questions designed to instantly pierce the candidate's packaging.
 ```
 
 ### 🔵 Layer 2: The Good Cop's Pragmatic Calibration Prompt (Main Agent)
@@ -76,12 +78,22 @@ Your task: **Filter out the Sub-Agent's emotion, mine the candidate's residual v
 [Final Output (JSON)]:
 - `matched_role`: The final authentic matched role after global optimization (often a downgraded result).
 - `final_tier`: Final rating (Tier 1~4).
-- `decision_reason`: Your justification for retention or grading (e.g., "Although their grand narrative is packaged, they possess proficient execution-level coding skills. Downgrading to [Junior Backend], rating Tier 3, absorb with lower salary expectations.").
+- `decision_reason`: Your justification for retention or grading.
 ```
 
 ---
 
-## 🗺️ 4. Workflow Pipeline
+## 🚨 4. Data Merge & Write-back Protocol (Anti-Omission Guardrail)
+When the Main Agent executes the final `batch_update` to Lark Bitable, there is a **high risk of "hallucinating away" or omitting the Sub-Agent's toxic review** due to the Main Agent's tendency to only write its own conclusions. The code and execution workflow MUST forcibly merge and map BOTH layers:
+- Layer 1 (Bad Cop)'s `roast_report` MUST be preserved verbatim and written to `[Sub-Agent Roast / Negotiation Room]`.
+- Layer 1 (Bad Cop)'s `interview_traps` MUST be written exactly as generated to `[Interview Traps]`.
+- Layer 2 (Good Cop)'s `decision_reason` is written to `[Main Agent Decision]`.
+
+**It is strictly prohibited for the Main Agent to filter, summarize, or omit the Bad Cop's attack report during the final database write. The Blue Team's pragmatic calibration is an additive field; the Red Team's toxic review MUST be served in full.**
+
+---
+
+## 🗺️ 5. Workflow Pipeline
 
 ```mermaid
 sequenceDiagram
@@ -93,14 +105,14 @@ sequenceDiagram
     HR->>Feishu: 1. Input roles, anti-fraud standards, and routing configs
     HR->>Feishu: 2. Upload resume (Status=Pending AI)
     
-    Main->>Feishu: 3. Read [System Routing Config] to get the latest Folder Tokens
+    Main->>Feishu: 3. Read [System Routing Config] to get Folder Tokens
     Main->>Main: 4. Fetch pending resumes + Native PDF extraction, push dual formats to respective routes
     Main->>SubAgent: 5. sessions_spawn triggers Red Team Audit
     
     Note over SubAgent: 🔍 Ignores grand narratives, demands hard data
-    SubAgent-->>Main: 6. Returns Roast Report (Fact, Roast)
+    SubAgent-->>Main: 6. Returns Roast Report & Interview Traps
     
-    Note over Main: ⚖️ Blue Team Pragmatic Calibration<br/>Mines value, filters emotion, downgrades if necessary
+    Note over Main: ⚖️ Blue Team Pragmatic Calibration<br/>Mandatory Data Merge of Bad Cop's Report
     Main->>Main: 7. Evaluates Fact + Roast + Full JD Library
     
     Main->>Feishu: 8. batch_update writes back to Bitable
@@ -108,9 +120,9 @@ sequenceDiagram
 
 ---
 
-## 🛠️ 5. Execution Standards & Guardrails
-1. **Source Acquisition**: Download the resume. **Recommended Path:** Use the native multi-modal `pdf` tool (Zero OCR, accurately interprets layout and implicit logic).
-2. **Observe Dynamic Routing**: The extracted PDF and MD files MUST be stored in the respective Folder Tokens specified in the **[System Routing Config]**. Hardcoding directories or scattering them in the root drive is strictly prohibited. Retaining the anti-overwrite UUID is mandatory.
+## 🛠️ 6. Execution Standards & Guardrails
+1. **Source Acquisition**: Use the native multi-modal `pdf` tool (Zero OCR).
+2. **Observe Dynamic Routing**: Extracted PDF and MD files MUST be stored in the respective Folder Tokens specified in the **[System Routing Config]**. Retaining the anti-overwrite UUID is mandatory.
 3. **Asynchronous Tearing (Sub-Agent)**: Spawn the Bad Cop to generate the aggressive anti-fraud report.
-4. **Main Process Consolidation (Main Agent)**: The Good Cop executes secondary fallback evaluation to provide the final `matched_role` and `Tier`.
-5. **Safe Write-back**: Use `batch_update` with exponential backoff retries to respect Lark API rate limits.
+4. **Main Process Consolidation (Main Agent)**: **MUST strictly execute the [Data Merge Guardrail] in Section 4.**
+5. **Safe Write-back**: Use `batch_update` with exponential backoff retries.
