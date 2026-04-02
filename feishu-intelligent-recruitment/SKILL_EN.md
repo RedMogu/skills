@@ -142,10 +142,9 @@ sequenceDiagram
 
 ## 🛠️ 6. Execution Standards & Guardrails
 1. **Source Acquisition & File Fallback Rule**: 
-   - When receiving a resume processing task or Bitable record link, the Main Agent **is prohibited from performing complex Record ID searches or blind guessing**. It MUST strictly follow a simple file fallback mechanism:
-     1. **Check for a Markdown Resume first**: Look in the Lark directory or local inbound folder. If an MD resume exists, run the process with it immediately.
-     2. **If no MD, check for a PDF Resume**: If no MD exists but a native PDF is found, trigger the multi-modal parsing and run the process.
-     3. **If neither exists, STOP and ask the user**: Never enter infinite search loops. If the candidate's files cannot be found, halt operations instantly and request the file from the human user.
+   - When receiving a resume processing task or Bitable record link, the Main Agent **is prohibited from performing complex Record ID searches or blind guessing**. It MUST strictly follow a Lark/Feishu-specific content validation mechanism:
+     - **Check BOTH the "Parsed Resume Link (MD)" and the "Original Resume Link (PDF)"** to see **which one actually has content**. In Lark/Feishu workflows, both files might exist but one might be an empty shell or brief summary. **Use whichever file actually contains the full, real resume content to run the process**.
+     - If neither has valid content, STOP and ask the user. Never enter infinite search loops.
 2. **Observe Dynamic Routing**: Extracted PDF and MD files MUST be stored in the respective Folder Tokens specified in the **[System Routing Config]**. Retaining the anti-overwrite UUID is mandatory.
 3. **Asynchronous Tearing (Sub-Agent)**: Spawn the Bad Cop to generate the aggressive anti-fraud report.
 4. **Main Process Consolidation (Main Agent)**: **MUST strictly execute the [Data Merge Guardrail] in Section 4.**
