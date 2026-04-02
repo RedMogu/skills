@@ -24,8 +24,9 @@
 - **Sub-Agent Roast** (多行文本): 师爷猫找出的缺陷与压价铁证。
 - **Interview Traps / 面试陷阱** (多行文本): 师爷猫为面试官准备的致命连击拷问。
 - **Main Agent Decision** (多行文本): 大主管的最终捞人/定级理据。
+- **Negotiation Room / 压价底线策略** (多行文本): 大主管基于降维生成的 HR 三段式谈判话术（估算底牌、戳破幻想、降维定薪）。
 - **Tier** (单选标签): Tier 1 (核心) / Tier 2 (性价比降维) / Tier 3 (廉价) / Tier 4 (淘汰)。
-- **Confidence Score** (数字): 0-100分，低于60分触发熔断转人工。
+- **Combat Score / 战力分** (数字): 0-100分，量化的技术与综合底盘能力。
 
 ### 📌 Table 2: 防伪时间轴与常识红线 (Anti-Fraud Dictionary)
 - **校验项名称** (文本): 例如 `DeepSeek-V3` (技术) 或 `拼多多跨境出海红利期` (运营)。

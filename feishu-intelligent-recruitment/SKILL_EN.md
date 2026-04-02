@@ -24,8 +24,9 @@ Strictly follows the **OpenClaw A2A Collaboration Protocol**:
 - **Sub-Agent Roast** (Multi-line Text): Flaws and negotiation evidence found by the Bad Cop.
 - **Interview Traps** (Multi-line Text): Deadly interview questions prepared by the Bad Cop.
 - **Main Agent Decision** (Multi-line Text): The Good Cop's final justification for retaining/grading the candidate.
+- **Negotiation Room** (Multi-line Text): The Good Cop's three-part HR negotiation script (Base Estimate, Puncture Illusions, Down-leveling Pitch).
 - **Tier** (Single Select): Tier 1 (Core) / Tier 2 (Cost-effective Downgrade) / Tier 3 (Cheap Labor) / Tier 4 (Eliminated).
-- **Confidence Score** (Number): 0-100. Triggers human intervention if below 60.
+- **Combat Score** (Number): 0-100, quantified fundamental capabilities.
 
 ### 📌 Table 2: Anti-Fraud Timeline & Red Lines (Anti-Fraud Dictionary)
 - **Verification Item** (Text): e.g., `DeepSeek-V3` (Tech) or `E-commerce Dividend Period` (Operations).
