@@ -1,4 +1,4 @@
-# 🎯 Lark/Feishu Intelligent Recruitment: Harness Engineering Resume Screening SOP (V3.0 - Open Skill)
+# 🎯 Lark/Feishu Intelligent Recruitment: Harness Engineering Resume Screening SOP (V3.3 - Open Skill)
 
 > **Core Philosophy**: LLMs have limitations and are easily fooled by resumes stuffed with buzzwords like "Agent, ReAct, RAG, High Concurrency". This skill utilizes **OpenClaw Multi-Agent Collaboration (A2A)** to pioneer a **[Red/Blue Team Audit Mechanism (Bad Cop / Good Cop)]**. The Sub-Agent acts as the "Red Team Attacker" for ruthless debunking; the Main Agent acts as the "Blue Team Pragmatist" for final value extraction and pragmatic calibration. Built on native PDF multi-modal parsing and Lark (Feishu) Bitable state machines.
 
@@ -10,13 +10,13 @@ Strictly follows the **OpenClaw A2A Collaboration Protocol**:
 
 ---
 
-## 🗄️ 2. Lark Bitable Schema (Multi-JD Support)
+## 🗄️ 2. Lark Bitable Schema (Multi-JD Support & Dynamic Routing)
 
-> **Auto-Provisioning**: If no table token is provided, the Main Agent will automatically call the API to create the following three tables.
+> **Auto-Provisioning**: If no table token is provided, the Main Agent will automatically call the API to create the following four tables.
 
 ### 📌 Table 1: Candidates (State Machine)
 - **Name/Email/Phone** (Text): Unique primary key.
-- **Resume File** (Attachment/Link): PDF uploaded by HR.
+- **Resume File** (Attachment/Link): PDF uploaded by HR or direct Lark Drive link.
 - **Applied Role** (Text): The role the candidate explicitly applied for.
 - **Status** (Single Select): `[Pending AI]`, `[Processing]`, `[AI Scored]`, `[Pending Human]`, `[Interviewing]`, `[Rejected]`.
 - **Matched JD** (Text): The final authentic role determined after the Main Agent's calibration.
@@ -34,6 +34,14 @@ Strictly follows the **OpenClaw A2A Collaboration Protocol**:
 ### 📌 Table 3: JD Library
 - **JD ID / Role Name** (Text PK): e.g., `Senior AI Architect`, `Overseas Growth Ops`.
 - **Core Hard Requirements** (Multi-line Text): The absolute bottom line of authentic capabilities required.
+
+### 📌 Table 4: ⚙️ System Routing Config
+Used to decouple underlying logic and implement dynamic file routing:
+- **Config Key**: e.g., `PDF Resume Route` or `Markdown Resume Route`.
+- **Folder Token**: The corresponding Lark Drive target folder Token.
+- **Mechanism & Purpose**: 
+  - PDFs must be directed to a **dedicated anti-overwrite directory**, strictly retaining the UUID to prevent file loss.
+  - Markdown parsed versions must be sent to the default `candidates` directory for LLM review.
 
 ---
 
@@ -82,25 +90,27 @@ sequenceDiagram
     participant Main as Main Agent (Good Cop)
     participant SubAgent as Sub-Agent (Bad Cop)
 
-    HR->>Feishu: 1. Input various roles into [JD Library]
+    HR->>Feishu: 1. Input roles, anti-fraud standards, and routing configs
     HR->>Feishu: 2. Upload resume (Status=Pending AI)
     
-    Main->>Main: 3. Fetch pending resumes + Native PDF extraction
-    Main->>SubAgent: 4. sessions_spawn triggers Red Team Audit
+    Main->>Feishu: 3. Read [System Routing Config] to get the latest Folder Tokens
+    Main->>Main: 4. Fetch pending resumes + Native PDF extraction, push dual formats to respective routes
+    Main->>SubAgent: 5. sessions_spawn triggers Red Team Audit
     
     Note over SubAgent: 🔍 Ignores grand narratives, demands hard data
-    SubAgent-->>Main: 5. Returns Roast Report (Fact, Roast)
+    SubAgent-->>Main: 6. Returns Roast Report (Fact, Roast)
     
     Note over Main: ⚖️ Blue Team Pragmatic Calibration<br/>Mines value, filters emotion, downgrades if necessary
-    Main->>Main: 6. Evaluates Fact + Roast + Full JD Library
+    Main->>Main: 7. Evaluates Fact + Roast + Full JD Library
     
-    Main->>Feishu: 7. batch_update writes back to Bitable
+    Main->>Feishu: 8. batch_update writes back to Bitable
 ```
 
 ---
 
 ## 🛠️ 5. Execution Standards & Guardrails
-1. **Source Acquisition**: Download the resume. **Recommended Path:** Use the native multi-modal `pdf` tool (Zero OCR, accurately interprets layout and implicit logic). **Fallback Path:** If your Agent environment lacks native PDF capabilities, fall back to a traditional third-party OCR API to extract the document as Markdown text before feeding it to the LLM.
-2. **Asynchronous Tearing (Sub-Agent)**: Spawn the Bad Cop to generate the aggressive anti-fraud report.
-3. **Main Process Consolidation (Main Agent)**: The Good Cop executes secondary fallback evaluation to provide the final `matched_role` and `Tier`.
-4. **Safe Write-back**: Use `batch_update` with exponential backoff retries to respect Lark API rate limits.
+1. **Source Acquisition**: Download the resume. **Recommended Path:** Use the native multi-modal `pdf` tool (Zero OCR, accurately interprets layout and implicit logic).
+2. **Observe Dynamic Routing**: The extracted PDF and MD files MUST be stored in the respective Folder Tokens specified in the **[System Routing Config]**. Hardcoding directories or scattering them in the root drive is strictly prohibited. Retaining the anti-overwrite UUID is mandatory.
+3. **Asynchronous Tearing (Sub-Agent)**: Spawn the Bad Cop to generate the aggressive anti-fraud report.
+4. **Main Process Consolidation (Main Agent)**: The Good Cop executes secondary fallback evaluation to provide the final `matched_role` and `Tier`.
+5. **Safe Write-back**: Use `batch_update` with exponential backoff retries to respect Lark API rate limits.
