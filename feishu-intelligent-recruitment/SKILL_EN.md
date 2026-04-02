@@ -27,6 +27,9 @@ Strictly follows the **OpenClaw A2A Collaboration Protocol**:
 - **Negotiation Room** (Multi-line Text): The Good Cop's three-part HR negotiation script (Base Estimate, Puncture Illusions, Down-leveling Pitch).
 - **Tier** (Single Select): Tier 1 (Core) / Tier 2 (Cost-effective Downgrade) / Tier 3 (Cheap Labor) / Tier 4 (Eliminated).
 - **Combat Score** (Number): 0-100, quantified fundamental capabilities.
+- **Original Resume Link (PDF)** (URL): Internal link pointing to the native PDF in the anti-overwrite folder (Must be written as JSON).
+- **Parsed Resume Link (MD)** (URL): Internal link pointing to the Markdown parsed resume.
+- **Radar Link (Evaluation Report)** (URL): Internal link pointing to the generated Red/Blue Team Evaluation Report.
 
 ### 📌 Table 2: Anti-Fraud Timeline & Red Lines (Anti-Fraud Dictionary)
 - **Verification Item** (Text): e.g., `DeepSeek-V3` (Tech) or `E-commerce Dividend Period` (Operations).
