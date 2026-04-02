@@ -92,7 +92,10 @@ When the Main Agent executes the final `batch_update` to Lark Bitable, there is 
 **It is strictly prohibited for the Main Agent to filter, summarize, or omit the Bad Cop's attack report during the final database write. The Blue Team's pragmatic calibration is an additive field; the Red Team's toxic review MUST be served in full.**
 
 [CRITICAL URL FORMAT & ROUTING CONSTRAINTS FOR BITABLE]:
-1. **URL Fields MUST be JSON Objects**: When writing URL fields like `战力雷达链接` (Radar Link) and `简历链接` (Resume Link) to Lark Bitable, you **MUST strictly use** the JSON format `{"link": "url", "text": "text"}`. The Lark API will silently drop the data if the format is incorrect!
+1. **URL Fields MUST be JSON Objects**: When writing URL fields to Lark Bitable, you **MUST strictly use** the JSON format `{"link": "url", "text": "text"}`. The Lark API will silently drop the data if the format is incorrect! The three core link fields to be written are:
+   - `原始简历链接 (PDF)` (Original Resume Link): Points to the native PDF in the anti-overwrite directory.
+   - `解析简历链接 (MD)` (Parsed Resume Link): Points to the Markdown resume used for LLM review.
+   - `战力雷达链接 (评估报告)` (Radar Link): Points to the final Red/Blue Team Evaluation Report (`_Evaluation.md`).
 2. **Absolute Ban on External Links**: Links written to Bitable **MUST be 100% internal Lark Drive links** (e.g., `https://sjpygirjnpj2.jp.larksuite.com/file/<file_token>`). It is **strictly prohibited** to use any external rendering routes (such as `dashboard.redmogu.org` or other Nginx/Web URLs). Enterprise intranet data must remain completely closed-loop within the Lark ecosystem.
 3. **Independent Archiving of Evaluation Reports**: The generated Red/Blue Team Evaluation Reports (`_Evaluation.md`) MUST be moved into the dedicated Folder Token specified by `红蓝对抗评估报告路由` in the System Routing Config. **Never** leave them in the root directory of the cloud space.
 
